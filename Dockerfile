@@ -1,5 +1,5 @@
 # Base image
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 # System environment variables
 ENV PYTHONUBUFFERED=1 \
@@ -35,4 +35,4 @@ RUN python django_app/manage.py collectstatic --noinput
 EXPOSE 7860
 
 # Execute migrations and launch Gunicorn on 0.0.0.0:7860
-CMD ["sh", "-c", "python django_app/manage.py migrate && gunicorn -bind 0.0.0.0:$PORT --workers 2 --timeout 120 core.wsgi:applicaton"]
+CMD ["sh", "-c", "python django_app/manage.py migrate && gunicorn --bind 0.0.0.0:$PORT --chdir django_app config.wsgi:application"]
