@@ -22,8 +22,9 @@ RUN pip install --no-cache-dir -r requirements.txt gunicorn whitenoise
 # Copy application source code
 COPY . .
 
-# Create non-root user (UID 1000 required by Hugging Face)
-RUN useradd -m -u 1000 user && \
+# Create target static files directory and create non-root user (UID 1000 required by Hugging Face)
+RUN mkdir -p /app/staticfiles && \
+    useradd -m -u 1000 user && \
     chown -R user:user /app
 
 USER user
