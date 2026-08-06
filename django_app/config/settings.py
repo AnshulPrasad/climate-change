@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-9983-&^h1vj&61_3_nu*mwmp5o#ai_llf5og00q$fwf#tr&)cy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "0.0.0.0",
+    "127.0.0.1",
+    "localhost",
+    ".hf.space",  # Covers all Hugging Face Space subdomains
+]
 
 
 # Application definition
