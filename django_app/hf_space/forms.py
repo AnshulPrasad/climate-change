@@ -1,38 +1,65 @@
 from django import forms
 
-SOURCE_CHOICES = [
-    ("home", "Home"),
-    ("copernicus", "Copernicus"),
-    ("earth_engine", "Google Earth Engine"),
-    ("hugging_face", "Hugging Face"),
-    ("nasa", "NASA Power / Earthdata"),
-    ("noaa", "NOAA"),
-    ("owid", "Our World in Data"),
-    ("world_bank", "World Bank"),
-]
+class CopernicusForm(forms.Form):
+    """Specific query parameters for the Copernicus Climate Data Store API."""
+    dataset = forms.ChoiceField(
+        choices=[('reanalysis-era5-single-levels', 'ERA5 Single Levels')],
+        initial='reanalysis-era5-single-levels',
+        label="Dataset"
+    )
 
-class ClimateDataConfigForm(forms.Form):
-    source = forms.ChoiceField(
-        choices=SOURCE_CHOICES,
-        widget = forms.HiddenInput() # Controlled by the sidebar section
+    product_type = forms.MultipleChoiceField(
+        choices=[('reanalysis', 'Reanalysis')],
+        initial=['reanalysis'],
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
     )
-    start_date = forms.DateField(
-        widget=forms.DateInput(attrs={'type':'date', 'class':'form-control'})
+
+    variable = forms.MultipleChoiceField(
+        choices=[('2m_temperature', '2m Temperature')],  # Append additional variables as required
+        initial=['2m_temperature'],
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
     )
-    end_date = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+
+    year = forms.MultipleChoiceField(
+        choices=[(str(y), str(y)) for y in range(1940, 2027)],
+        initial=['2024'],
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
     )
-    dataset = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'class':'form-control', 'placeholder':'City / Coordinates'})
+
+    month = forms.MultipleChoiceField(
+        choices=[(f"{m:02d}", f"{m:02d}") for m in range(1, 13)],
+        initial=['03'],
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
     )
-    location = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'class':'form-control','placeholder':'India'})
+
+    day = forms.MultipleChoiceField(
+        choices=[(f"{d:02d}", f"{d:02d}") for d in range(1, 32)],
+        initial=['01'],
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
     )
-    station = forms.CharField(
-        max_length=100,
-        widget=forms.TextInput(attrs={'class':'form-control','placeholder':'Station ID / Name'})
+
+    time = forms.MultipleChoiceField(
+        choices=[(f"{h:02d}:00", f"{h:02d}:00") for h in range(24)],
+        initial=['13:00'],
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+    )
+
+    area = forms.CharField(
+        initial='30, 70, 8, 90',
+        help_text="Format: North, West, South, East",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    data_format = forms.ChoiceField(
+        choices=[('grib', 'GRIB'), ('netcdf', 'NetCDF')],
+        initial='grib',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    download_format = forms.ChoiceField(
+        choices=[('unarchived', 'Unarchived'), ('zip', 'ZIP')],
+        initial='unarchived',
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     def clean(self):
