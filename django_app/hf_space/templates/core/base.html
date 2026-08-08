@@ -25,19 +25,33 @@
             <h2>Data Sources</h2>
             <ul>
                 <!-- Home Link -->
-                <li class="{% if active_source == 'home' %}active{% endif %}">
-                    <a href="?source=home">🏠 Home</a>
+                <li class="{% if not service_name %}active{% endif %}">
+                    <a href="{% url 'dashboard_default' %}">🏠 Home</a>
                 </li>
                 <hr style="border: 0; border-top: 1px solid #334155; margin: 10px 0;">
 
-                <!-- Data Sources Links -->
-                <li class="{% if active_source == 'copernicus' %}active{% endif %}"><a href="?source=copernicus">Copernicus</a></li>
-                <li class="{% if active_source == 'earth_engine' %}active{% endif %}"><a href="?source=earth_engine">Google Earth Engine</a></li>
-                <li class="{% if active_source == 'hugging_face' %}active{% endif %}"><a href="?source=hugging_face">Hugging Face</a></li>
-                <li class="{% if active_source == 'nasa' %}active{% endif %}"><a href="?source=nasa">NASA</a></li>
-                <li class="{% if active_source == 'noaa' %}active{% endif %}"><a href="?source=noaa">NOAA</a></li>
-                <li class="{% if active_source == 'owid' %}active{% endif %}"><a href="?source=owid">Our World in Data</a></li>
-                <li class="{% if active_source == 'world_bank' %}active{% endif %}"><a href="?source=world_bank">World Bank</a></li>
+                <!-- Data Sources Links utilizing dynamic routing -->
+                <li class="{% if service_name == 'copernicus' %}active{% endif %}">
+                    <a href="{% url 'dashboard_service' service_name='copernicus' %}">Copernicus</a>
+                </li>
+                <li class="{% if service_name == 'earth_engine' %}active{% endif %}">
+                    <a href="{% url 'dashboard_service' service_name='earth_engine' %}">Google Earth Engine</a>
+                </li>
+                <li class="{% if service_name == 'hugging_face' %}active{% endif %}">
+                    <a href="{% url 'dashboard_service' service_name='hugging_face' %}">Hugging Face</a>
+                </li>
+                <li class="{% if service_name == 'nasa' %}active{% endif %}">
+                    <a href="{% url 'dashboard_service' service_name='nasa' %}">NASA</a>
+                </li>
+                <li class="{% if service_name == 'noaa' %}active{% endif %}">
+                    <a href="{% url 'dashboard_service' service_name='noaa' %}">NOAA</a>
+                </li>
+                <li class="{% if service_name == 'owid' %}active{% endif %}">
+                    <a href="{% url 'dashboard_service' service_name='owid' %}">Our World in Data</a>
+                </li>
+                <li class="{% if service_name == 'world_bank' %}active{% endif %}">
+                    <a href="{% url 'dashboard_service' service_name='world_bank' %}">World Bank</a>
+                </li>
             </ul>
         </aside>
 
