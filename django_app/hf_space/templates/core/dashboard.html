@@ -1,61 +1,36 @@
+<!-- django_app/hf_space/templates/core/dashboard.html -->
 {% extends 'core/base.html' %}
 
 {% block content %}
-{% if active_source == 'home' %}
-
-<!-- Landing / Home View -->
-<div class="panel">
-    <h1>Climate Data Aggregation Platform</h1>
-    <p style="margin-top: 10px; color: #475569;">
-        Select a climate data provider from the sidebar menu on the left to configure dataset parameters, temporal ranges, and geographic locations.
-    </p>
-</div>
-
-{% else %}
-
-<!-- Configuration Form View -->
-<h1>Configuration Tool: {{ active_source|title }}</h1>
-
-<div class="config-card">
-    <form method="post">
-        {% csrf_token %}
-        <input type="hidden" name="source" value="{{ active_source }}">
-
-        <div class="form-grid">
-            <div class="form-group"><label>Start Date</label>{{ form.start_date }}</div>
-            <div class="form-group"><label>End Date</label>{{ form.end_date }}</div>
-            <div class="form-group"><label>Dataset</label>{{ form.dataset }}</div>
-            <div class="form-group"><label>Location</label>{{ form.location }}</div>
-            <div class="form-group"><label>Country</label>{{ form.country }}</div>
-            <div class="form-group"><label>Station</label>{{ form.station }}</div>
-        </div>
-
-        <button type="submit" class="btn-submit">Execute Query</button>
-    </form>
-</div>
-
-{% if results %}
-<div class="results-grid">
-    <div class="panel">
-        <h3>Metrics & Statistics</h3>
-        <hr><br>
-        <p><strong>Source:</strong> {{ results.source_name }}</p>
-        <p><strong>Mean Temp:</strong> {{ results.stats.mean_temperature }}</p>
-        <p><strong>Trend:</strong> {{ results.stats.anomaly_trend }}</p>
-        <p><strong>Data Points:</strong> {{ results.stats.data_points_processed }}</p>
+<div class="dashboard-module">
+    <div class="query-interface">
+        <h2>Data Request: {{ service_name|title }}</h2>
+        <form method="POST">
+            {% csrf_token %}
+            <!-- Dynamic Form Injection -->
+            {% if service_name == 'copernicus' %}
+                {% include 'core/partials/forms/copernicus_form.html' %}
+            {% elif service_name == 'earth_engine' %}
+                {% include 'core/partials/forms/earth_engine_form.html' %}
+            {% else %}
+                {{ form.as_p }}
+            {% endif %}
+            <button type="submit">Submit Request</button>
+        </form>
     </div>
 
-    <div class="panel">
-        <h3>Geospatial Map & Summary</h3>
-        <hr><br>
-        <div style="background: #e2e8f0; height: 200px; display:flex; align-items:center; justify-content:center; margin-bottom:15px;">
-            [ Map Component Rendering Area: {{ results.map_coordinates.location }} ]
-        </div>
-        <h4>Summary Report</h4>
-        <p>{{ results.summary }}</p>
+    <div class="output-interface">
+        <h2>Execution Output</h2>
+        {% if output_data %}
+            <!-- Dynamic Output Rendering -->
+            {% if output_format == 'raster' %}
+                {% include 'core/partials/outputs/raster_output.html' %}
+            {% elif output_format == 'tabular' %}
+                {% include 'core/partials/outputs/tabular_output.html' %}
+            {% endif %}
+        {% else %}
+            <p>System initialized. Awaiting query execution.</p>
+        {% endif %}
     </div>
 </div>
-{% endif %}
-
-{% endif %}
 {% endblock %}
