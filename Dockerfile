@@ -4,7 +4,8 @@ FROM python:3.13-slim
 # System environment variables
 ENV PYTHONUBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PORT=7860
+    PORT=7860 \
+    TZ="America/Los_Angeles"
 
 # Set working directory
 WORKDIR /app
@@ -13,6 +14,8 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
+    libeccodes-dev \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python depedencies
