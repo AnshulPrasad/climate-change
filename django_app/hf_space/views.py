@@ -1,45 +1,60 @@
-from django.shortcuts import render
-from .forms import CopernicusForm, EarthEngineForm
-from django.http import HttpResponseBadRequest
-from .services.copernicus import CopernicusService
+from django.views import View
+from django.shortcuts import render, Http404
+from .registry import PROVIDER_REGISTRY
 
-# Registry mapping service identifiers to their respective forms
-FORM_REGISTRY = {
-    'copernicus': CopernicusForm,
-    'earth_engine': EarthEngineForm,
-}
+class HomeView(View):
+    """Renders the neutral landing page."""
 
-# Registry mapping service identifiers to output formats
-OUTPUT_FORMAT_REGISTRY = {
-    'copernicus': 'tabular',
-    'earth_engine': 'raster',
-}
+    def get(self, request, *args, **kwargs):
+        context = {
+            'all_providers': PROVIDER_REGISTRY,
+            'active_provider': None,
+        }
+        return render(request, 'hf_space/home.html', context)
 
-# Create your views here.
-def dashboard(request, service_name='copernicus'):
-    """Dynamically initializes form and processes data based on service selection."""
-    if service_name not in FORM_REGISTRY:
-        return HttpResponseBadRequest("Invalid service specified.")
 
-    form_class = FORM_REGISTRY.get(service_name, 'copernicus')
-    output_format = OUTPUT_FORMAT_REGISTRY.get(service_name, 'tabular')
-    output_data = None
+class ProviderDashboardView(View):
+    """
+    A unified Class-Based View handling dynamic execution for all registered data providers.
+    """
 
-    if request.method == 'POST':
-        form = form_class(request.POST)
+    def _get_provider_config(self, provider_id: str) -> dict:
+        """Retrieves provider dependencies or raises a 404 exception."""
+        config = PROVIDER_REGISTRY.get(provider_id)
+        if not config:
+            raise Http404(f"Data provider '{provider_id}' is not registered.")
+        return config
+
+    def _build_context(self, config: dict, form, provider_id: str, output_data=None) -> dict:
+        """Constructs the template context payload."""
+        return {
+            'form': form,
+            'provider_name': config['name'],
+            'output_data': output_data,
+            'active_provider': provider_id,
+            'all_providers': PROVIDER_REGISTRY,
+        }
+
+    def get(self, request, provider_id: str, *args, **kwargs):
+        """Handles initial page loads (HTTP GET)."""
+        config = self._get_provider_config(provider_id)
+        FormClass = config['form_class']
+
+        context = self._build_context(config, FormClass(), provider_id)
+        return render(request, config['template_name'], context)
+
+    def post(self, request, provider_id: str, *args, **kwargs):
+        """Handles form submissions and API execution (HTTP POST)."""
+        config = self._get_provider_config(provider_id)
+        FormClass = config['form_class']
+        ServiceClass = config['service_class']
+
+        form = FormClass(data=request.POST)
+        output_data = None
+
         if form.is_valid():
-            # Route validated data to the respective service execution handler
-            if service_name == 'copernicus':
-                service = CopernicusService()
-                output_data = service.fetch_data(form.cleaned_data)
-            # Add elif blocks for additional services here
-    else:
-        form = form_class()
-    context = {
-        'form': form,
-        'service_name': service_name,
-        'output_data': output_data,
-        'output_format':output_format
-    }
+            service = ServiceClass()
+            output_data = service.fetch_data(provider_id, form.cleaned_data)
 
-    return render(request, 'core/dashboard.html', context)
+        context = self._build_context(config, form, provider_id, output_data)
+        return render(request, config['template_name'], context)
