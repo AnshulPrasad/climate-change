@@ -11,62 +11,66 @@ class CopernicusForm(forms.Form):
     product_type = forms.MultipleChoiceField(
         choices=[('reanalysis', 'Reanalysis')],
         initial=['reanalysis'],
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        label='Product Type',
+        widget=forms.CheckboxSelectMultiple
     )
 
     variable = forms.MultipleChoiceField(
         choices=[('2m_temperature', '2m Temperature')],  # Append additional variables as required
         initial=['2m_temperature'],
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        label='Variables(s)',
+        widget=forms.CheckboxSelectMultiple
     )
 
     year = forms.MultipleChoiceField(
         choices=[(str(y), str(y)) for y in range(1940, 2027)],
         initial=['2024'],
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        label='Year(s)',
+        widget=forms.CheckboxSelectMultiple
     )
 
     month = forms.MultipleChoiceField(
         choices=[(f"{m:02d}", f"{m:02d}") for m in range(1, 13)],
         initial=['03'],
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        label='Month(s)',
+        widget=forms.CheckboxSelectMultiple
     )
 
     day = forms.MultipleChoiceField(
         choices=[(f"{d:02d}", f"{d:02d}") for d in range(1, 32)],
         initial=['01'],
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        label='Day(s)',
+        widget=forms.CheckboxSelectMultiple
     )
 
     time = forms.MultipleChoiceField(
         choices=[(f"{h:02d}:00", f"{h:02d}:00") for h in range(24)],
         initial=['13:00'],
-        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+        label='Time(s)',
+        widget=forms.CheckboxSelectMultiple
     )
 
     area = forms.CharField(
         initial='30, 70, 8, 90',
-        help_text="Format: North, West, South, East",
-        widget=forms.TextInput(attrs={'class': 'form-control'})
+        help_text="Format: North, West, South, East (e.g., 30, 70, 8, 90)",
+        label='Bounding Box'
     )
 
     data_format = forms.ChoiceField(
         choices=[('grib', 'GRIB'), ('netcdf', 'NetCDF')],
         initial='grib',
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label='Data Format'
     )
 
     download_format = forms.ChoiceField(
         choices=[('unarchived', 'Unarchived'), ('zip', 'ZIP')],
         initial='unarchived',
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label='Download Format'
     )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        start = cleaned_data.get('start_date')
-        end = cleaned_data.get('end_date')
+class EarthEngineForm(forms.Form):
+    """Specific parameters for Google Earth Engine."""
+    asset_id = forms.CharField(max_length=255)
+    bbox = forms.CharField(help_text="Bounding box coordinates: min_lon, min_lat, max_lon, max_lat")
 
-        if start and end and start > end:
-            raise forms.ValidationError('Start date must precede end date')
-        return cleaned_data
+# Subclass forms for Hugging Face, NASA, NOAA, OWID, and World Bank respectively.
