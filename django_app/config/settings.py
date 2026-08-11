@@ -122,3 +122,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Whitelist Hugging Face Space domains for POST request validation
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.hf.space',
+    'https://huggingface.co'
+]
