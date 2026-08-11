@@ -128,3 +128,11 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.hf.space',
     'https://huggingface.co'
 ]
+
+# Explicitly allow cross-origin cookies for iframe embedding
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+
+# Apply the same policy to session cookies to prevent login/state failures
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
