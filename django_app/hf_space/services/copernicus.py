@@ -1,14 +1,14 @@
 import cdsapi
 from pathlib import Path
 import xarray as xr
+import zipfile
+import tarfile
 
 class CopernicusService:
     def __init__(self):
         self.client = cdsapi.Client()
 
-    def fetch_data(self, provider_id: str, cleaned_data: dict) -> list:
-        dataset_id = "reanalysis-era5-single-levels"
-
+    def fetch_data(self, dataset_id: str, cleaned_data: dict) -> list:
         # Determine file extension based on user selection
         data_format = cleaned_data.get("format", "grib")
         file_ext = ".nc" if data_format == "netcdf" else ".grib"
@@ -18,6 +18,24 @@ class CopernicusService:
         if "area" in cleaned_data and isinstance(cleaned_data["area"], str):
             cleaned_data["area"] = [float(x.strip()) for x in cleaned_data["area"].split(",")]
 
+        # CDS API Pre-flight Sanitation
+        if dataset_id == "ecv-for-climate-change":
+            # Translate standard 'format' to dataset-specific 'data_format'
+            if "format" in cleaned_data:
+                cleaned_data["data_format"] = cleaned_data.pop("format")
+
+            product_types = cleaned_data.get("product_type", [])
+            if isinstance(product_types, str):
+                product_types = [product_types]
+
+            # Remove reference period if no anomaly or climatology is requested
+            if not any(pt in ["anomaly", "climatology"] for pt in product_types):
+                cleaned_data.pop("climate_reference_period", None)
+
+            # Remove specific years if ONLY a climatology is requested
+            if product_types == ["climatology"]:
+                cleaned_data.pop("year", None)
+
         # Download the file via CDS API
         self.client.retrieve(dataset_id, cleaned_data, str(output_path))
 
@@ -25,29 +43,38 @@ class CopernicusService:
         return self._parse_file_to_table(output_path, data_format)
 
     def _parse_file_to_table(self, file_path: Path, data_format: str) -> list:
-        """Opens the binary dataset and converts a preview slice to a list of dicts."""
+        """Opens the dataset, extracting it first if Copernicus delivered an archive."""
         try:
-            # Select the appropriate backend engine
-            engine = "netcdf4" if data_format == "netcdf" else "cfgrib"
+            # 1. Archive Detection and Extraction
+            if zipfile.is_zipfile(file_path):
+                extract_dir = file_path.parent / f"{file_path.stem}_extracted"
+                with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                    zip_ref.extractall(extract_dir)
+                # Target the first valid data file inside the extracted directory
+                extracted_files = [f for f in extract_dir.rglob("*") if f.is_file()]
+                if extracted_files:
+                    file_path = extracted_files[0]
 
-            # Open the multi-dimensional dataset
+            elif tarfile.is_tarfile(file_path):
+                extract_dir = file_path.parent / f"{file_path.stem}_extracted"
+                with tarfile.open(file_path, 'r') as tar_ref:
+                    tar_ref.extractall(extract_dir)
+                extracted_files = [f for f in extract_dir.rglob("*") if f.is_file()]
+                if extracted_files:
+                    file_path = extracted_files[0]
+
+            # 2. Xarray Parsing Pipeline
+            engine = "netcdf4" if data_format == "netcdf" else "cfgrib"
             ds = xr.open_dataset(file_path, engine=engine)
 
-            # Flatten the dimensions into a standard tabular Pandas DataFrame
+            # Flatten to tabular dataframe
             df = ds.to_dataframe().reset_index()
-
-            # Clean up the data by removing empty spatial nodes (NaNs)
             df = df.dropna()
 
-            # Slice the first 100 rows for UI performance
-            df_subset = df.head(100)
+            # Sub-sample for UI performance and stringify
+            df_subset = df.head(100).astype(str)
 
-            # Convert all timestamps and complex objects to strings for HTML serialization
-            df_subset = df_subset.astype(str)
-
-            # Return as a list of dictionaries for Django template rendering
             return df_subset.to_dict(orient='records')
 
         except Exception as e:
-            # If parsing fails, return the error as a table row so it's visible in the UI
             return [{"Data Processing Error": f"Failed to parse {data_format.upper()} file: {str(e)}"}]

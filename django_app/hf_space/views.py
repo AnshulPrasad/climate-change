@@ -40,7 +40,20 @@ class ProviderDashboardView(View):
         config = self._get_provider_config(provider_id)
         FormClass = config['form_class']
 
-        context = self._build_context(config, FormClass(), provider_id)
+        # Extract dataset parameter if the provider supports multiple datasets
+        form_kwargs = {}
+        dataset_id = None
+        if 'datasets' in config:
+            dataset_id = request.GET.get('dataset') or list(config['datasets'].keys())[0]
+            form_kwargs['dataset_id'] = dataset_id
+
+        form = FormClass(**form_kwargs)
+        context = self._build_context(config, form, provider_id)
+
+        if 'datasets' in config:
+            context['datasets'] = config['datasets']
+            context['current_dataset'] = dataset_id
+
         return render(request, config['template_name'], context)
 
     def post(self, request, provider_id: str, *args, **kwargs):
@@ -49,12 +62,25 @@ class ProviderDashboardView(View):
         FormClass = config['form_class']
         ServiceClass = config['service_class']
 
-        form = FormClass(data=request.POST)
+        form_kwargs = {'data': request.POST}
+        dataset_id = None
+        if 'datasets' in config:
+            dataset_id = request.GET.get('dataset') or list(config['datasets'].keys())[0]
+            form_kwargs['dataset_id'] = dataset_id
+
+        form = FormClass(**form_kwargs)
         output_data = None
 
         if form.is_valid():
             service = ServiceClass()
-            output_data = service.fetch_data(provider_id, form.cleaned_data)
+            # Pass specific dataset_id if applicable; otherwise fallback to provider_id
+            target_id = dataset_id if dataset_id else provider_id
+            output_data = service.fetch_data(target_id, form.cleaned_data)
 
         context = self._build_context(config, form, provider_id, output_data)
+
+        if 'datasets' in config:
+            context['datasets'] = config['datasets']
+            context['current_dataset'] = dataset_id
+
         return render(request, config['template_name'], context)

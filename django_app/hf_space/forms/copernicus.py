@@ -1,17 +1,15 @@
 import json
 from pathlib import Path
 from django import forms
-from ..constants.copernicus import COPERNICUS_VARIABLE_CHOICES
 
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schemas" / "copernicus.json"
+
 
 class DynamicCDSFormFactory:
     @staticmethod
     def _get_choice_generator(field_spec: dict) -> list:
         if "choices" in field_spec:
             return field_spec["choices"]
-        elif "choices_category" in field_spec:
-            return COPERNICUS_VARIABLE_CHOICES
         elif "choices_range" in field_spec:
             start, end = field_spec["choices_range"]
             return [(str(i), str(i)) for i in range(start, end)]
@@ -24,10 +22,12 @@ class DynamicCDSFormFactory:
         return []
 
     @classmethod
-    def create_form(cls, data: dict = None) -> forms.Form:
-        dataset_id = "reanalysis-era5-single-levels"
+    def create_form(cls, dataset_id: str, data: dict = None) -> forms.Form:
         with open(SCHEMA_PATH, "r") as f:
             schemas = json.load(f)
+
+        if dataset_id not in schemas:
+            raise ValueError(f"Schema for dataset '{dataset_id}' not found.")
 
         schema = schemas[dataset_id]
         fields = {}
@@ -46,11 +46,16 @@ class DynamicCDSFormFactory:
                 )
             elif field_type in ("multiple_choice", "categorized_multiple_choice"):
                 choices = cls._get_choice_generator(spec)
+                widget = forms.CheckboxSelectMultiple()
+
+                if field_type == "categorized_multiple_choice":
+                    widget.attrs['is_categorized'] = True
+
                 fields[field_name] = forms.MultipleChoiceField(
                     choices=choices,
                     initial=default_val,
                     label=label,
-                    widget=forms.CheckboxSelectMultiple
+                    widget=widget
                 )
             elif field_type == "char":
                 fields[field_name] = forms.CharField(
@@ -58,5 +63,5 @@ class DynamicCDSFormFactory:
                     label=label
                 )
 
-        form_class = type(f"Dynamic_{dataset_id.title()}_Form", (forms.Form,), fields)
+        form_class = type(f"Dynamic_{dataset_id.replace('-', '_').title()}_Form", (forms.Form,), fields)
         return form_class(data=data)

@@ -21,7 +21,8 @@
         <div class="form-group">
             <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
 
-            {% if field.name == 'variable' %}
+            <!-- Dynamic check looking for the custom 'is_categorized' flag -->
+            {% if field.field.widget.attrs.is_categorized %}
                 <input type="text" class="variable-search-box" id="variable-search" placeholder="Search variables..." onkeyup="filterVariables()">
                 <div id="variable-accordion-container">
                     {% for category, choices in field.field.choices %}
@@ -41,11 +42,14 @@
                         </details>
                     {% endfor %}
                 </div>
+
+            <!-- Standard fallback for flat multiple-choice fields -->
             {% elif field.widget_type == 'checkboxselectmultiple' %}
                 <details class="checkbox-dropdown">
                     <summary>Select {{ field.label }}...</summary>
                     {{ field }}
                 </details>
+
             {% else %}
                 <div class="standard-input">
                     {{ field }}

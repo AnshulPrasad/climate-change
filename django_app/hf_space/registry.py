@@ -9,6 +9,11 @@ PROVIDER_REGISTRY = {
         'form_class': DynamicCDSFormFactory.create_form,
         'service_class': CopernicusService,
         'template_name': 'hf_space/providers/copernicus_dashboard.html', # Dedicated template
+        'datasets': {
+            'reanalysis-era5-single-levels': 'ERA5 Single Levels',
+            'reanalysis-era5-pressure-levels': 'ERA5 Pressure Levels',
+            'ecv-for-climate-change': 'Essential Climate Variables (1979-Present)'
+        }
     },
     'earth_engine': {
         'name': 'Google Earth Engine',
