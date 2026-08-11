@@ -35,5 +35,11 @@ RUN python django_app/manage.py collectstatic --noinput
 # Expose port 7860
 EXPOSE 7860
 
-# Execute migrations and launch Gunicorn on 0.0.0.0:7860
-CMD ["sh", "-c", "python django_app/manage.py migrate && gunicorn --bind 0.0.0.0:$PORT --chdir django_app config.wsgi:application"]
+# Shift the execution context strictly into the nested application directory
+WORKDIR /app/django_app
+
+# Explicitly define the fully qualified namespace for the settings module
+ENV DJANGO_SETTINGS_MODULE="config.settings"
+
+# Execute the WSGI application with the extended timeout threshold
+CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:7860", "--workers", "2", "--timeout", "300"]
