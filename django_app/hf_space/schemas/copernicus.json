@@ -1,0 +1,22 @@
+{
+  "reanalysis-era5-single-levels": {
+    "product_type": {"type": "multiple_choice", "choices": [["reanalysis", "Reanalysis"]], "default": ["reanalysis"]},
+    "variable": {"type": "categorized_multiple_choice", "choices_category": "COPERNICUS_VARIABLE_CHOICES", "default": ["2m_temperature"]},
+    "year": {"type": "multiple_choice", "choices_range": [1940, 2027], "default": ["2024"]},
+    "month": {"type": "multiple_choice", "choices_format": "month", "default": ["03"]},
+    "day": {"type": "multiple_choice", "choices_format": "day", "default": ["01"]},
+    "time": {"type": "multiple_choice", "choices_format": "time", "default": ["13:00"]},
+    "area": {"type": "char", "default": "30, 70, 8, 90"},
+    "format": {"type": "choice", "choices": [["grib", "GRIB"], ["netcdf", "NetCDF"]], "default": "grib"}
+  },
+  "reanalysis-era5-pressure-levels": {
+    "product_type": {"type": "multiple_choice", "choices": [["reanalysis", "Reanalysis"]], "default": ["reanalysis"]},
+    "variable": {"type": "multiple_choice", "choices": [["temperature", "Temperature"], ["relative_humidity", "Relative Humidity"]], "default": ["temperature"]},
+    "pressure_level": {"type": "multiple_choice", "choices": [["1000", "1000 hPa"], ["850", "850 hPa"], ["500", "500 hPa"]], "default": ["1000"]},
+    "year": {"type": "multiple_choice", "choices_range": [1940, 2027], "default": ["2024"]},
+    "month": {"type": "multiple_choice", "choices_format": "month", "default": ["03"]},
+    "day": {"type": "multiple_choice", "choices_format": "day", "default": ["01"]},
+    "time": {"type": "multiple_choice", "choices_format": "time", "default": ["13:00"]},
+    "format": {"type": "choice", "choices": [["grib", "GRIB"], ["netcdf", "NetCDF"]], "default": "grib"}
+  }
+}
