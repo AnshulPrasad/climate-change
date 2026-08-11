@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from django import forms
-from django_app.hf_space.constants.copernicus import COPERNICUS_VARIABLE_CHOICES
+from ..constants.copernicus import COPERNICUS_VARIABLE_CHOICES
 
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schemas" / "copernicus.json"
 
