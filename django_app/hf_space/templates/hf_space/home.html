@@ -1,0 +1,12 @@
+{% extends 'hf_space/layout/base.html' %}
+
+{% block content %}
+    <!-- Injects the dynamic sidebar directly into the flex container -->
+    {% include 'hf_space/layout/sidebar.html' %}
+
+    <main class="provider-workspace">
+        <div style="display: flex; height: 100%; align-items: center; justify-content: center; color: #64748b;">
+            <p>Select a data provider from the sidebar menu to initiate an extraction.</p>
+        </div>
+    </main>
+{% endblock %}
