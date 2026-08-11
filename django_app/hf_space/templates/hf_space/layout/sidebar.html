@@ -1,0 +1,18 @@
+<aside class="sidebar">
+    <h2>Data Sources</h2>
+    <ul>
+        <!-- Home Link -->
+        <li class="{% if not active_provider %}active{% endif %}">
+            <a href="{% url 'home' %}">🏠 Home</a>
+        </li>
+
+        <hr style="border: 0; border-top: 1px solid #334155; margin: 10px 0;">
+
+        <!-- Dynamic Data Sources Links -->
+        {% for provider_key, provider_info in all_providers.items %}
+            <li class="{% if active_provider == provider_key %}active{% endif %}">
+                <a href="{% url 'dashboard' provider_id=provider_key %}">{{ provider_info.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</aside>
