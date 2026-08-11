@@ -1,58 +1,53 @@
-import cdsapi, os
+import cdsapi
+from pathlib import Path
 import xarray as xr
-from dotenv import load_dotenv, find_dotenv
-from django.conf import settings
-
-load_dotenv(find_dotenv())
 
 class CopernicusService:
     def __init__(self):
-        # url, key are saved to .cdsapirc
-        self.client = cdsapi.Client(os.getenv('CDSAPI_URL'), os.getenv('CDSAPI_KEY'))
+        self.client = cdsapi.Client()
 
-    def fetch_data(self, cleaned_data: dict) -> list:
-        """
-        Submits the parameterized query to the CDS API, downloads the asset,
-        and initiates the parsing sequence.
-        """
-        # Isolate the dataset identifier from the payload parameters
-        dataset = cleaned_data.pop('dataset')
+    def fetch_data(self, provider_id: str, cleaned_data: dict) -> list:
+        dataset_id = "reanalysis-era5-single-levels"
 
-        # Enforce numerical list format for spatial boundaries
-        if 'area' in cleaned_data:
-            raw_area = cleaned_data['area']
+        # Determine file extension based on user selection
+        data_format = cleaned_data.get("format", "grib")
+        file_ext = ".nc" if data_format == "netcdf" else ".grib"
 
-            # Extract the string if it was improperly wrapped in a single-element list
-            if isinstance(raw_area, list) and isinstance(raw_area[0], str):
-                raw_area = raw_area[0]
+        output_path = Path(f"/tmp/{dataset_id}_output{file_ext}")
 
-            # Cast the comma-separated string into a list of numerical coordinates
-            if isinstance(raw_area, str):
-                cleaned_data['area'] = [float(coord.strip()) for coord in raw_area.split(',')]
+        if "area" in cleaned_data and isinstance(cleaned_data["area"], str):
+            cleaned_data["area"] = [float(x.strip()) for x in cleaned_data["area"].split(",")]
 
-        # Define a temporary file path for the binary download
-        file_path = os.path.join(settings.BASE_DIR, 'temp_copernicus_output.grib')
+        # Download the file via CDS API
+        self.client.retrieve(dataset_id, cleaned_data, str(output_path))
 
-        # Execute API request with corrected payload
-        self.client.retrieve(dataset, cleaned_data, file_path)
+        # Parse the downloaded binary file into a tabular dictionary
+        return self._parse_file_to_table(output_path, data_format)
 
-        return self._parse_grib_to_tabular(file_path)
-
-    @staticmethod
-    def _parse_grib_to_tabular(file_path: str) -> list:
+    def _parse_file_to_table(self, file_path: Path, data_format: str) -> list:
+        """Opens the binary dataset and converts a preview slice to a list of dicts."""
         try:
-            # Decode the GRIB binary into an xarray Dataset
-            dataset = xr.open_dataset(file_path, engine='cfgrib')
+            # Select the appropriate backend engine
+            engine = "netcdf4" if data_format == "netcdf" else "cfgrib"
 
-            # Transform the dimensional matrix into a 2D Pandas DataFrame
-            dataframe = dataset.to_dataframe().reset_index()
-            dataset.close()
+            # Open the multi-dimensional dataset
+            ds = xr.open_dataset(file_path, engine=engine)
 
-            # Serialize a subset of the DataFrame to prevent HTTP payload saturation
-            records = dataframe.head(100).to_dict(orient='records')
-            return records
+            # Flatten the dimensions into a standard tabular Pandas DataFrame
+            df = ds.to_dataframe().reset_index()
 
-        finally:
-            # Ensure deterministic cleanup of the temporary binary asset
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            # Clean up the data by removing empty spatial nodes (NaNs)
+            df = df.dropna()
+
+            # Slice the first 100 rows for UI performance
+            df_subset = df.head(100)
+
+            # Convert all timestamps and complex objects to strings for HTML serialization
+            df_subset = df_subset.astype(str)
+
+            # Return as a list of dictionaries for Django template rendering
+            return df_subset.to_dict(orient='records')
+
+        except Exception as e:
+            # If parsing fails, return the error as a table row so it's visible in the UI
+            return [{"Data Processing Error": f"Failed to parse {data_format.upper()} file: {str(e)}"}]
