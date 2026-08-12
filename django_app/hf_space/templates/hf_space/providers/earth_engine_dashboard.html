@@ -1,0 +1,68 @@
+{% extends 'hf_space/layout/base.html' %}
+
+{% block content %}
+    {% include 'hf_space/layout/sidebar.html' %}
+    
+    <!-- Load Leaflet CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <main class="provider-workspace" style="display: flex; gap: 20px;">
+        
+        <section class="ee-input-panel" style="flex: 1; max-width: 400px;">
+            <h2>{{ provider_name }} Parameters</h2>
+            
+            <div class="dataset-selector" style="margin: 15px 0;">
+                <label for="dataset-select" style="font-weight: 600; font-size: 0.9rem;">Dataset Collection</label>
+                <select id="dataset-select" onchange="window.location.href='?dataset=' + this.value" style="width: 100%; padding: 8px; border-radius: 4px; margin-top: 6px;">
+                    {% for key, name in datasets.items %}
+                        <option value="{{ key }}" {% if key == current_dataset %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <form method="POST" action="?dataset={{ current_dataset }}">
+                {% csrf_token %}
+                <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                    {% for field in form %}
+                        <div>
+                            <label style="font-weight: 600; font-size: 0.9rem;">{{ field.label }}</label>
+                            <div style="margin-top: 5px;">{{ field }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" style="margin-top: 20px; width: 100%; padding: 10px; background-color: #059669; color: white; border: none; border-radius: 4px; cursor: pointer;">Generate Map</button>
+            </form>
+        </section>
+
+        <section class="ee-visualization-panel" style="flex: 2; display: flex; flex-direction: column;">
+            <h2>Geospatial Visualization</h2>
+            {% if output_data and output_data.tile_url %}
+                <div id="map" style="flex: 1; min-height: 500px; margin-top: 15px; border-radius: 8px; border: 1px solid #cbd5e1;"></div>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var map = L.map('map').setView([{{ output_data.center_lat }}, {{ output_data.center_lon }}], {{ output_data.zoom }});
+                        
+                        // Base Map (OpenStreetMap)
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '© OpenStreetMap contributors',
+                            opacity: 0.7
+                        }).addTo(map);
+
+                        // GEE Raster Overlay
+                        L.tileLayer('{{ output_data.tile_url }}', {
+                            attribution: 'Map Data © Google Earth Engine',
+                            format: 'png',
+                            transparent: true
+                        }).addTo(map);
+                    });
+                </script>
+            {% else %}
+                <div class="empty-state" style="margin-top: 15px; padding: 20px; background-color: #e2e8f0; border-radius: 4px; flex: 1;">
+                    <p style="color: #64748b;">Awaiting query execution...</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+{% endblock %}

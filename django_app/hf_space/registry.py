@@ -1,5 +1,5 @@
 from .forms.copernicus import DynamicCDSFormFactory
-from .forms.earth_engine import EarthEngineForm
+from .forms.earth_engine import EarthEngineFormFactory
 from .services.copernicus import CopernicusService
 from .services.earth_engine import EarthEngineService
 
@@ -17,8 +17,14 @@ PROVIDER_REGISTRY = {
     },
     'earth_engine': {
         'name': 'Google Earth Engine',
-        'form_class': EarthEngineForm,
+        'form_class': EarthEngineFormFactory.create_form,
         'service_class': EarthEngineService,
         'template_name': 'hf_space/providers/earth_engine_dashboard.html', # Dedicated template
+        'datasets': {
+            'sentinel-5p': 'Sentinel-5P (Atmospheric Composition)',
+            'hansen-global-forest-change': 'Hansen Global Forest Change',
+            'modis-land-surface-temp': 'MODIS Land Surface Temperature',
+            'jrc-global-surface-water': 'JRC Global Surface Water'
+        }
     }
 }
