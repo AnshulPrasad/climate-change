@@ -1,22 +1,39 @@
 <style>
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
     .field-label { font-weight: 600; color: #1e293b; font-size: 0.9rem; }
 
     /* Standard Inputs */
-    .standard-input input, .standard-input select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.9rem; background-color: #fff; }
+    .standard-input input, .standard-input select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.9rem; background-color: #fff; box-sizing: border-box; }
 
     /* Dropdown Wrappers */
-    .checkbox-dropdown { border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; padding: 10px; }
+    .checkbox-dropdown { position: relative; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; padding: 10px; box-sizing: border-box; }
     .checkbox-dropdown summary { cursor: pointer; font-size: 0.9rem; color: #475569; font-weight: 500; outline: none; }
     .checkbox-dropdown summary:hover { color: #0284c7; }
 
-    /* Standard Multiple Choice List */
-    .checkbox-dropdown > ul { list-style: none; padding: 10px 0 0 0; margin: 0; max-height: 200px; overflow-y: auto; }
+    /* ============================================================== */
+    /* ABSOLUTE OVERLAY FOR DROPDOWNS (Prevents pushing rows down)    */
+    /* ============================================================== */
+    .checkbox-dropdown > ul,
+    .variable-dropdown-content {
+        position: absolute;
+        top: calc(100% + 4px); /* Appears just below the selection box */
+        left: 0;
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Drop shadow to emphasize float */
+        z-index: 9999; /* Forces it over all other grid items and buttons */
+        box-sizing: border-box;
+    }
+
+    /* Standard Multiple Choice List (Overlay) */
+    .checkbox-dropdown > ul { list-style: none; padding: 10px; margin: 0; max-height: 250px; overflow-y: auto; }
     .checkbox-dropdown > ul li { margin: 6px 0; font-size: 0.85rem; }
 
-    /* Categorized Variable List (Vertical Layout) */
-    .variable-dropdown-content { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1; }
-    .variable-search-box { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; }
+    /* Categorized Variable List (Overlay) */
+    .variable-dropdown-content { padding: 12px; }
+    .variable-search-box { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 10px; font-size: 0.85rem; box-sizing: border-box; }
 
     .variable-list-container { max-height: 250px; overflow-y: auto; padding-right: 5px; }
     .category-group { margin-bottom: 12px; }
@@ -28,7 +45,6 @@
 </style>
 
 {% for field in form %}
-    <!-- Removed full-width-grid-item so it falls naturally into the standard column layout -->
     <div class="form-group">
         <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
 
@@ -93,4 +109,13 @@
             group.style.display = visibleItems ? 'block' : 'none';
         });
     }
+
+    // Optional: Close dropdown if user clicks completely outside of it
+    document.addEventListener('click', function(event) {
+        document.querySelectorAll('.checkbox-dropdown').forEach(details => {
+            if (!details.contains(event.target)) {
+                details.removeAttribute('open');
+            }
+        });
+    });
 </script>
