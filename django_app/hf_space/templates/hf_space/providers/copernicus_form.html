@@ -4,8 +4,16 @@
     .full-width-grid-item { grid-column: 1 / -1; } /* Forces large items to span all columns in the grid */
     .standard-input input, .standard-input select { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.9rem; background-color: #fff; }
 
-    /* Variable Category Box Styling */
-    .variable-search-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 12px; font-size: 0.9rem; }
+    /* Dropdown Wrappers */
+    .checkbox-dropdown { border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; padding: 10px; }
+    .checkbox-dropdown summary { cursor: pointer; font-size: 0.9rem; color: #475569; font-weight: 500; outline: none; }
+    .checkbox-dropdown summary:hover { color: #0284c7; }
+    .checkbox-dropdown ul { list-style: none; padding: 10px 0 0 0; margin: 0; max-height: 150px; overflow-y: auto; }
+    .checkbox-dropdown ul li { margin: 6px 0; font-size: 0.85rem; }
+
+    /* Categorized Variable Layout */
+    .variable-dropdown-content { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; }
+    .variable-search-box { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 15px; font-size: 0.9rem; }
     .variable-columns-container { column-count: 2; column-gap: 16px; width: 100%; }
     @media (max-width: 900px) { .variable-columns-container { column-count: 1; } }
     .category-accordion { border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 12px; background-color: #ffffff; break-inside: avoid; display: inline-block; width: 100%; }
@@ -15,45 +23,49 @@
     .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; padding: 15px; border-top: 1px solid #f1f5f9; max-height: 220px; overflow-y: auto; }
     .checkbox-item { display: flex; align-items: flex-start; gap: 8px; font-size: 0.85rem; color: #475569; cursor: pointer; line-height: 1.4; }
     .checkbox-item input { margin-top: 3px; }
-    .checkbox-dropdown { border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; padding: 10px; }
-    .checkbox-dropdown summary { cursor: pointer; font-size: 0.9rem; color: #475569; }
-    .checkbox-dropdown ul { list-style: none; padding: 10px 0 0 0; margin: 0; max-height: 150px; overflow-y: auto; }
-    .checkbox-dropdown ul li { margin: 6px 0; font-size: 0.85rem; }
 </style>
 
 {% for field in form %}
-    <!-- If the field is the large categorized variable array, force it to span the full grid width -->
     <div class="form-group {% if field.field.widget.attrs.is_categorized or field.name == 'variable' %}full-width-grid-item{% endif %}">
         <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
 
         {% if field.field.widget.attrs.is_categorized %}
-            <input type="text" class="variable-search-box" id="variable-search" placeholder="Search variables..." onkeyup="filterVariables()">
 
-            <div class="variable-columns-container" id="variable-accordion-container">
-                {% for category, choices in field.field.choices %}
-                    <details class="category-accordion" open>
-                        <summary class="category-summary">
-                            <span>{{ category }}</span>
-                            <button type="button" class="btn-select-all" onclick="toggleCategory(event, this)">Select All</button>
-                        </summary>
-                        <div class="checkbox-grid">
-                            {% for val, label in choices %}
-                                <label class="checkbox-item" data-search-target="{{ label|lower }}">
-                                    <input type="checkbox" name="{{ field.name }}" value="{{ val }}" {% if val in field.value %}checked{% endif %}>
-                                    <span>{{ label }}</span>
-                                </label>
-                            {% endfor %}
-                        </div>
-                    </details>
-                {% endfor %}
-            </div>
+            <!-- Added the details wrapper to collapse the massive variable grid -->
+            <details class="checkbox-dropdown">
+                <summary>▶ Select {{ field.label }}...</summary>
+
+                <div class="variable-dropdown-content">
+                    <input type="text" class="variable-search-box" id="variable-search" placeholder="Search variables..." onkeyup="filterVariables()">
+
+                    <div class="variable-columns-container" id="variable-accordion-container">
+                        {% for category, choices in field.field.choices %}
+                            <details class="category-accordion" open>
+                                <summary class="category-summary">
+                                    <span>{{ category }}</span>
+                                    <button type="button" class="btn-select-all" onclick="toggleCategory(event, this)">Select All</button>
+                                </summary>
+                                <div class="checkbox-grid">
+                                    {% for val, label in choices %}
+                                        <label class="checkbox-item" data-search-target="{{ label|lower }}">
+                                            <input type="checkbox" name="{{ field.name }}" value="{{ val }}" {% if val in field.value %}checked{% endif %}>
+                                            <span>{{ label }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </details>
+                        {% endfor %}
+                    </div>
+                </div>
+            </details>
+
         {% elif field.widget_type == 'checkboxselectmultiple' %}
             <details class="checkbox-dropdown">
-                <summary>Select {{ field.label }}...</summary>
+                <summary>▶ Select {{ field.label }}...</summary>
                 {{ field }}
             </details>
         {% else %}
-            <!-- Standard Inputs naturally fall into the 250px grid columns -->
+            <!-- Standard Inputs -->
             <div class="standard-input">
                 {{ field }}
             </div>
