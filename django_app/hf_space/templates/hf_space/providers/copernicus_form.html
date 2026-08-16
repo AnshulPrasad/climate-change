@@ -31,9 +31,9 @@
 
         {% if field.field.widget.attrs.is_categorized %}
 
-            <!-- Added the details wrapper to collapse the massive variable grid -->
             <details class="checkbox-dropdown">
-                <summary>▶ Select {{ field.label }}...</summary>
+                <!-- Removed the hardcoded arrow here -->
+                <summary>Select {{ field.label }}...</summary>
 
                 <div class="variable-dropdown-content">
                     <input type="text" class="variable-search-box" id="variable-search" placeholder="Search variables..." onkeyup="filterVariables()">
@@ -61,7 +61,8 @@
 
         {% elif field.widget_type == 'checkboxselectmultiple' %}
             <details class="checkbox-dropdown">
-                <summary>▶ Select {{ field.label }}...</summary>
+                <!-- Removed the hardcoded arrow here -->
+                <summary>Select {{ field.label }}...</summary>
                 {{ field }}
             </details>
         {% else %}
