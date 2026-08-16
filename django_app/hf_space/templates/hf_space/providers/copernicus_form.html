@@ -2,12 +2,15 @@
     .copernicus-parameters { display: flex; flex-direction: column; gap: 16px; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     .field-label { font-weight: 600; color: #1e293b; font-size: 0.9rem; }
-    .variable-search-box { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 8px; font-size: 0.85rem; }
-    .category-accordion { border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 6px; background-color: #ffffff; }
+    .variable-search-box { width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 12px; font-size: 0.85rem; }
+
+    .variable-columns-container { column-count: 2; column-gap: 16px; width: 100%; }
+    .category-accordion { border: 1px solid #e2e8f0; border-radius: 4px; margin-bottom: 12px; background-color: #ffffff; break-inside: avoid; display: inline-block; width: 100%; }
+
     .category-summary { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; cursor: pointer; font-weight: 600; color: #334155; background-color: #f8fafc; border-radius: 4px; }
     .btn-select-all { background: #e2e8f0; border: none; padding: 4px 8px; border-radius: 3px; font-size: 0.75rem; cursor: pointer; color: #475569; }
     .btn-select-all:hover { background: #cbd5e1; color: #0f172a; }
-    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; padding: 12px 14px; border-top: 1px solid #f1f5f9; max-height: 200px; overflow-y: auto; }
+    .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; padding: 12px 14px; border-top: 1px solid #f1f5f9; max-height: 200px; overflow-y: auto; }
     .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #475569; cursor: pointer; }
     .checkbox-dropdown { border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; padding: 8px; }
     .checkbox-dropdown summary { cursor: pointer; font-size: 0.9rem; color: #475569; }
@@ -21,10 +24,10 @@
         <div class="form-group">
             <label class="field-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
 
-            <!-- Dynamic check looking for the custom 'is_categorized' flag -->
             {% if field.field.widget.attrs.is_categorized %}
                 <input type="text" class="variable-search-box" id="variable-search" placeholder="Search variables..." onkeyup="filterVariables()">
-                <div id="variable-accordion-container">
+
+                <div class="variable-columns-container" id="variable-accordion-container">
                     {% for category, choices in field.field.choices %}
                         <details class="category-accordion" open>
                             <summary class="category-summary">
@@ -42,52 +45,31 @@
                         </details>
                     {% endfor %}
                 </div>
-
-            <!-- Standard fallback for flat multiple-choice fields -->
             {% elif field.widget_type == 'checkboxselectmultiple' %}
-                <details class="checkbox-dropdown">
-                    <summary>Select {{ field.label }}...</summary>
-                    {{ field }}
-                </details>
-
+                <details class="checkbox-dropdown"><summary>Select {{ field.label }}...</summary>{{ field }}</details>
             {% else %}
-                <div class="standard-input">
-                    {{ field }}
-                </div>
+                <div class="standard-input">{{ field }}</div>
             {% endif %}
 
-            {% if field.help_text %}
-                <span style="font-size: 0.75rem; color: #64748b;">{{ field.help_text }}</span>
-            {% endif %}
-
-            {% for error in field.errors %}
-                <span style="color: #ef4444; font-size: 0.8rem;">{{ error }}</span>
-            {% endfor %}
+            {% if field.help_text %}<span style="font-size: 0.75rem; color: #64748b;">{{ field.help_text }}</span>{% endif %}
+            {% for error in field.errors %}<span style="color: #ef4444; font-size: 0.8rem;">{{ error }}</span>{% endfor %}
         </div>
     {% endfor %}
 </div>
 
 <script>
     function toggleCategory(event, button) {
-        event.preventDefault();
-        event.stopPropagation();
+        event.preventDefault(); event.stopPropagation();
         const grid = button.closest('details').querySelector('.checkbox-grid');
         const checkboxes = grid.querySelectorAll('input[type="checkbox"]');
         const allChecked = Array.from(checkboxes).every(cb => cb.checked);
         checkboxes.forEach(cb => cb.checked = !allChecked);
         button.textContent = allChecked ? 'Select All' : 'Deselect All';
     }
-
     function filterVariables() {
         const query = document.getElementById('variable-search').value.toLowerCase();
-        const items = document.querySelectorAll('.checkbox-item');
-        items.forEach(item => {
-            const labelText = item.getAttribute('data-search-target');
-            if (labelText.includes(query)) {
-                item.style.display = 'flex';
-            } else {
-                item.style.display = 'none';
-            }
+        document.querySelectorAll('.checkbox-item').forEach(item => {
+            item.style.display = item.getAttribute('data-search-target').includes(query) ? 'flex' : 'none';
         });
     }
 </script>
