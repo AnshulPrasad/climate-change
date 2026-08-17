@@ -7,7 +7,7 @@
         <li class="{% if not active_provider %}active{% endif %}">
             <a href="{% url 'home' %}">
                 <span class="icon">🏠</span>
-                <span class="text">Home</span>
+                <span class="text">Overview</span>
             </a>
         </li>
 
@@ -17,7 +17,23 @@
             <li class="{% if active_provider == provider_key %}active{% endif %}">
                 <a href="{% url 'dashboard' provider_id=provider_key %}">
                     <span class="icon">
-                        {% if provider_key == 'copernicus' %}🌍{% elif provider_key == 'earth_engine' %}🛰️{% else %}📊{% endif %}
+                        {% if provider_key == 'copernicus' %}
+                            🌤️
+                        {% elif provider_key == 'earth_engine' %}
+                            🛰️
+                        {% elif provider_key == 'nasa' %}
+                            🚀
+                        {% elif provider_key == 'noaa' %}
+                            🌊
+                        {% elif provider_key == 'owid' %}
+                            🏭
+                        {% elif provider_key == 'world_bank' %}
+                            📈
+                        {% elif provider_key == 'hugging_face' %}
+                            🤗
+                        {% else %}
+                            📊
+                        {% endif %}
                     </span>
                     <span class="text">{{ provider_info.name }}</span>
                 </a>
