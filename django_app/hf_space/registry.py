@@ -4,6 +4,8 @@ from .forms.earth_engine import EarthEngineFormFactory
 from .services.earth_engine import EarthEngineService
 from .forms.nasa import NASAFormFactory
 from .services.nasa import NASAService
+from .forms.noaa import NOAAFormFactory
+from .services.noaa import NOAAService
 
 PROVIDER_REGISTRY = {
     'copernicus': {
@@ -36,6 +38,15 @@ PROVIDER_REGISTRY = {
         'template_name': 'hf_space/providers/nasa_dashboard.html',
         'datasets': {
             'mur-sst': 'MUR Sea Surface Temperature (JPL)'
+        }
+    },
+    'noaa': {
+        'name': 'NOAA Climate Data Online',
+        'form_class': NOAAFormFactory.create_form,
+        'service_class': NOAAService,
+        'template_name': 'hf_space/providers/noaa_dashboard.html',
+        'datasets': {
+            'cdo-gsom': 'Global Summary of the Month (GSOM)'
         }
     }
 }
