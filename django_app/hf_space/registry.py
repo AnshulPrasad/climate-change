@@ -18,7 +18,7 @@ PROVIDER_REGISTRY = {
         'name': 'Copernicus Climate Data Store',
         'form_class': DynamicCDSFormFactory.create_form,
         'service_class': CopernicusService,
-        'template_name': 'hf_space/providers/copernicus_dashboard.html', # Dedicated template
+        'template_name': 'hf_space/dashboards/copernicus.html', # Dedicated template
         'datasets': {
             'reanalysis-era5-single-levels': 'ERA5 Single Levels',
             'reanalysis-era5-pressure-levels': 'ERA5 Pressure Levels',
@@ -29,7 +29,7 @@ PROVIDER_REGISTRY = {
         'name': 'Google Earth Engine',
         'form_class': EarthEngineFormFactory.create_form,
         'service_class': EarthEngineService,
-        'template_name': 'hf_space/providers/earth_engine_dashboard.html', # Dedicated template
+        'template_name': 'hf_space/dashboards/earth_engine.html', # Dedicated template
         'datasets': {
             'sentinel-5p': 'Sentinel-5P (Atmospheric Composition)',
             'hansen-global-forest-change': 'Hansen Global Forest Change',
@@ -41,7 +41,7 @@ PROVIDER_REGISTRY = {
         'name': 'NASA Earthdata',
         'form_class': NASAFormFactory.create_form,
         'service_class': NASAService,
-        'template_name': 'hf_space/providers/nasa_dashboard.html',
+        'template_name': 'hf_space/dashboards/nasa.html',
         'datasets': {
             'mur-sst': 'MUR Sea Surface Temperature (JPL)'
         }
@@ -50,7 +50,7 @@ PROVIDER_REGISTRY = {
         'name': 'NOAA Climate Data Online',
         'form_class': NOAAFormFactory.create_form,
         'service_class': NOAAService,
-        'template_name': 'hf_space/providers/noaa_dashboard.html',
+        'template_name': 'hf_space/dashboards/noaa.html',
         'datasets': {
             'cdo-gsom': 'Global Summary of the Month (GSOM)'
         }
@@ -59,7 +59,7 @@ PROVIDER_REGISTRY = {
         'name': 'Our World in Data',
         'form_class': OWIDFormFactory.create_form,
         'service_class': OWIDService,
-        'template_name': 'hf_space/providers/owid_dashboard.html',
+        'template_name': 'hf_space/dashboards/owid.html',
         'datasets': {
             'co2-data': 'Global CO2 Emissions Data'
         }
@@ -68,7 +68,7 @@ PROVIDER_REGISTRY = {
         'name': 'World Bank Open Data',
         'form_class': WorldBankFormFactory.create_form,
         'service_class': WorldBankService,
-        'template_name': 'hf_space/providers/world_bank_dashboard.html',
+        'template_name': 'hf_space/dashboards/world_bank.html',
         'datasets': {
             'wb-climate-data': 'Global Climate & Environmental Indicators'
         }
@@ -77,7 +77,7 @@ PROVIDER_REGISTRY = {
         'name': 'Hugging Face Datasets',
         'form_class': HuggingFaceFormFactory.create_form,
         'service_class': HuggingFaceService,
-        'template_name': 'hf_space/providers/hugging_face_dashboard.html',
+        'template_name': 'hf_space/dashboards/hugging_face.html',
         'datasets': {
             'climate-fever': 'Climate FEVER (Fact-Checking)'
         }

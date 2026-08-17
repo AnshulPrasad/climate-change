@@ -7,7 +7,7 @@
     <!-- FORM SECTION (GRID LAYOUT)                 -->
     <!-- ========================================== -->
     <section class="input-panel" style="width: 100%; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 25px;">
-        <h2 style="margin-bottom: 25px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Data Request: {{ provider_name|default:"Hugging Face Datasets" }}</h2>
+        <h2 style="margin-bottom: 25px; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">Data Request: {{ provider_name|default:"NASA Earthdata" }}</h2>
 
         <form method="POST" action="?dataset={{ current_dataset }}">
             {% csrf_token %}
@@ -23,12 +23,12 @@
                     </select>
                 </div>
 
-                {% include 'hf_space/providers/hugging_face_form.html' %}
+                {% include 'hf_space/forms/nasa.html' %}
 
             </div>
 
-            <button type="submit" style="margin-top: 30px; width: 100%; padding: 14px; background-color: #eab308; color: #1e293b; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(234, 179, 8, 0.2);">
-                Query Dataset
+            <button type="submit" style="margin-top: 30px; width: 100%; padding: 14px; background-color: #0c4a6e; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(12, 74, 110, 0.2);">
+                Execute NASA Request
             </button>
         </form>
     </section>
