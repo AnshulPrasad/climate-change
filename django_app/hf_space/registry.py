@@ -6,6 +6,8 @@ from .forms.nasa import NASAFormFactory
 from .services.nasa import NASAService
 from .forms.noaa import NOAAFormFactory
 from .services.noaa import NOAAService
+from .forms.owid import OWIDFormFactory
+from .services.owid import OWIDService
 
 PROVIDER_REGISTRY = {
     'copernicus': {
@@ -47,6 +49,15 @@ PROVIDER_REGISTRY = {
         'template_name': 'hf_space/providers/noaa_dashboard.html',
         'datasets': {
             'cdo-gsom': 'Global Summary of the Month (GSOM)'
+        }
+    },
+'owid': {
+        'name': 'Our World in Data',
+        'form_class': OWIDFormFactory.create_form,
+        'service_class': OWIDService,
+        'template_name': 'hf_space/providers/owid_dashboard.html',
+        'datasets': {
+            'co2-data': 'Global CO2 Emissions Data'
         }
     }
 }
