@@ -1,7 +1,9 @@
 from .forms.copernicus import DynamicCDSFormFactory
-from .forms.earth_engine import EarthEngineFormFactory
 from .services.copernicus import CopernicusService
+from .forms.earth_engine import EarthEngineFormFactory
 from .services.earth_engine import EarthEngineService
+from .forms.nasa import NASAFormFactory
+from .services.nasa import NASAService
 
 PROVIDER_REGISTRY = {
     'copernicus': {
@@ -25,6 +27,15 @@ PROVIDER_REGISTRY = {
             'hansen-global-forest-change': 'Hansen Global Forest Change',
             'modis-land-surface-temp': 'MODIS Land Surface Temperature',
             'jrc-global-surface-water': 'JRC Global Surface Water'
+        }
+    },
+    'nasa': {
+        'name': 'NASA Earthdata',
+        'form_class': NASAFormFactory.create_form,
+        'service_class': NASAService,
+        'template_name': 'hf_space/providers/nasa_dashboard.html',
+        'datasets': {
+            'mur-sst': 'MUR Sea Surface Temperature (JPL)'
         }
     }
 }
