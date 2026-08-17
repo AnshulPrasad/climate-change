@@ -10,6 +10,8 @@ from .forms.owid import OWIDFormFactory
 from .services.owid import OWIDService
 from .forms.world_bank import WorldBankFormFactory
 from .services.world_bank import WorldBankService
+from .forms.hugging_face import HuggingFaceFormFactory
+from .services.hugging_face import HuggingFaceService
 
 PROVIDER_REGISTRY = {
     'copernicus': {
@@ -69,6 +71,15 @@ PROVIDER_REGISTRY = {
         'template_name': 'hf_space/providers/world_bank_dashboard.html',
         'datasets': {
             'wb-climate-data': 'Global Climate & Environmental Indicators'
+        }
+    },
+    'hugging_face': {
+        'name': 'Hugging Face Datasets',
+        'form_class': HuggingFaceFormFactory.create_form,
+        'service_class': HuggingFaceService,
+        'template_name': 'hf_space/providers/hugging_face_dashboard.html',
+        'datasets': {
+            'climate-fever': 'Climate FEVER (Fact-Checking)'
         }
     }
 }
