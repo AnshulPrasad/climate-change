@@ -1,0 +1,13 @@
+{
+  "global-temperatures": {
+    "region": {
+      "type": "choice",
+      "choices": [
+        ["Global", "Global (Land and Ocean)"],
+        ["Northern_Hemisphere", "Northern Hemisphere"],
+        ["Southern_Hemisphere", "Southern Hemisphere"]
+      ],
+      "default": "Global"
+    }
+  }
+}

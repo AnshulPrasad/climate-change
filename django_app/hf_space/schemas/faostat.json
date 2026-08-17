@@ -1,0 +1,20 @@
+{
+  "ag-emissions": {
+    "country": {
+      "type": "choice",
+      "choices": [
+        ["WLD", "World"], ["IND", "India"], ["USA", "United States"], ["CHN", "China"], ["BRA", "Brazil"]
+      ],
+      "default": "WLD"
+    },
+    "indicator": {
+      "type": "choice",
+      "choices": [
+        ["AG.LND.AGRI.ZS", "Agricultural Land (% of land area)"],
+        ["AG.PRD.CROP.XD", "Crop Production Index (2014-2016 = 100)"],
+        ["AG.LND.FRST.K2", "Forest Area (sq. km)"]
+      ],
+      "default": "AG.LND.AGRI.ZS"
+    }
+  }
+}

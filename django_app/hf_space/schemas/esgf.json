@@ -1,0 +1,23 @@
+{
+  "cmip6-search": {
+    "experiment": {
+      "type": "choice",
+      "choices": [
+        ["historical", "Historical (1850 - 2014)"],
+        ["ssp126", "SSP1-2.6 (Low Emissions Scenario)"],
+        ["ssp245", "SSP2-4.5 (Intermediate Scenario)"],
+        ["ssp585", "SSP5-8.5 (High Emissions Scenario)"]
+      ],
+      "default": "historical"
+    },
+    "variable": {
+      "type": "choice",
+      "choices": [
+        ["tas", "Near-Surface Air Temperature (tas)"],
+        ["pr", "Precipitation (pr)"],
+        ["tos", "Sea Surface Temperature (tos)"]
+      ],
+      "default": "tas"
+    }
+  }
+}

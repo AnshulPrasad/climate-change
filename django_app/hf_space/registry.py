@@ -12,6 +12,12 @@ from .forms.world_bank import WorldBankFormFactory
 from .services.world_bank import WorldBankService
 from .forms.hugging_face import HuggingFaceFormFactory
 from .services.hugging_face import HuggingFaceService
+from .forms.esgf import ESGFFormFactory
+from .forms.berkeley_earth import BerkeleyEarthFormFactory
+from .forms.faostat import FAOSTATFormFactory
+from .services.esgf import ESGFService
+from .services.berkeley_earth import BerkeleyEarthService
+from .services.faostat import FAOSTATService
 
 PROVIDER_REGISTRY = {
     'copernicus': {
@@ -81,5 +87,26 @@ PROVIDER_REGISTRY = {
         'datasets': {
             'climate-fever': 'Climate FEVER (Fact-Checking)'
         }
+    },
+    'esgf': {
+        'name': 'Earth System Grid Federation',
+        'form_class': ESGFFormFactory.create_form,
+        'service_class': ESGFService,
+        'template_name': 'hf_space/dashboards/esgf.html',
+        'datasets': {'cmip6-search': 'CMIP6 Climate Projections'}
+    },
+    'berkeley_earth': {
+        'name': 'Berkeley Earth',
+        'form_class': BerkeleyEarthFormFactory.create_form,
+        'service_class': BerkeleyEarthService,
+        'template_name': 'hf_space/dashboards/berkeley_earth.html',
+        'datasets': {'global-temperatures': 'Global Surface Temperatures'}
+    },
+    'faostat': {
+        'name': 'FAOSTAT',
+        'form_class': FAOSTATFormFactory.create_form,
+        'service_class': FAOSTATService,
+        'template_name': 'hf_space/dashboards/faostat.html',
+        'datasets': {'ag-emissions': 'Agricultural & Land Use Data'}
     }
 }
