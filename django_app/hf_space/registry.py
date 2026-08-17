@@ -8,6 +8,8 @@ from .forms.noaa import NOAAFormFactory
 from .services.noaa import NOAAService
 from .forms.owid import OWIDFormFactory
 from .services.owid import OWIDService
+from .forms.world_bank import WorldBankFormFactory
+from .services.world_bank import WorldBankService
 
 PROVIDER_REGISTRY = {
     'copernicus': {
@@ -51,13 +53,22 @@ PROVIDER_REGISTRY = {
             'cdo-gsom': 'Global Summary of the Month (GSOM)'
         }
     },
-'owid': {
+    'owid': {
         'name': 'Our World in Data',
         'form_class': OWIDFormFactory.create_form,
         'service_class': OWIDService,
         'template_name': 'hf_space/providers/owid_dashboard.html',
         'datasets': {
             'co2-data': 'Global CO2 Emissions Data'
+        }
+    },
+    'world_bank': {
+        'name': 'World Bank Open Data',
+        'form_class': WorldBankFormFactory.create_form,
+        'service_class': WorldBankService,
+        'template_name': 'hf_space/providers/world_bank_dashboard.html',
+        'datasets': {
+            'wb-climate-data': 'Global Climate & Environmental Indicators'
         }
     }
 }
