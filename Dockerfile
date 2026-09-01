@@ -5,7 +5,7 @@ FROM python:3.13-slim
 ENV PYTHONUBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PORT=7860 \
-    TZ="America/Los_Angeles"
+    TZ="Asia/Kolkata"
 
 # Set working directory
 WORKDIR /app
